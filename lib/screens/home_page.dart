@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maranaut/screens/emergency_alert.dart';
 import 'package:maranaut/screens/history_voyage.dart';
 import 'package:maranaut/screens/select_ship.dart';
 import 'package:maranaut/screens/select_yoyage.dart';
@@ -6,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   double totalFuelSaved = 1234.56;
   String shipName = "Sea Explorer";
   String shipModel = "X-200";
+  String shipId = '1';
 
   // Function to refresh the fuel data.
   void _refreshFuelData() {
@@ -25,7 +27,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // Function to load the selected ship data from local storage.
+  // Function to load the selected ship data (including ship ID) from local storage.
   Future<void> loadShipData() async {
     final prefs = await SharedPreferences.getInstance();
     final shipJson = prefs.getString("selectedShip");
@@ -34,6 +36,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         shipName = shipData["shipName"] ?? shipName;
         shipModel = shipData["type"] ?? shipModel;
+        shipId = shipData["id"] ?? shipId;
       });
     }
   }
@@ -47,20 +50,36 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar with logo, text, and user icon.
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xFF021934),
         title: Row(
           children: [
+            // Logo and "MeraNaut" text on the left.
             Image.asset(
-              'assets/images/logo.png', // Replace with your logo asset
+              'assets/images/logo.png', // Replace with your logo asset.
               height: 30,
               color: Colors.white,
             ),
-            SizedBox(width: 8),
-            const Text("MaraNaut", style: TextStyle(color: Colors.white)),
+            const SizedBox(width: 8),
+            const Text("MeraNaut", style: TextStyle(color: Colors.white)),
             const Spacer(),
+            // Icons on the right: location, notifications, user.
+            const Icon(Icons.location_on, color: Colors.white),
+            const SizedBox(width: 8),
+            // Notification icon wrapped with GestureDetector.
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // Pass the shipId loaded from local storage.
+                    builder: (context) => EmergencyAlertPage(shipId: shipId),
+                  ),
+                );
+              },
+              child: const Icon(Icons.notifications, color: Colors.white),
+            ),
+            const SizedBox(width: 8),
             const Icon(Icons.person, color: Colors.white),
           ],
         ),
@@ -68,13 +87,11 @@ class _HomePageState extends State<HomePage> {
       // Stack to display the background image and bottom card.
       body: Stack(
         children: [
-          // Full-screen Background image.
+          // Full-screen background image.
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                  'assets/images/bg.png',
-                ), // Replace with your background asset
+                image: AssetImage('assets/images/bg.png'), // Replace with your background asset.
                 fit: BoxFit.cover,
               ),
             ),
@@ -158,6 +175,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
+                      child: const Text("Select Ship"),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: const Color(0xFFA6CEEF),
@@ -166,7 +184,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                         minimumSize: const Size(0, 50),
                       ),
-                      child: const Text("Select Ship"),
                     ),
                   ],
                 ),
