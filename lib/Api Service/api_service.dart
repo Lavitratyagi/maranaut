@@ -33,6 +33,42 @@ class Ship {
   }
 }
 
+class History {
+  final String shipId;
+  final double srcLatitude;
+  final double srcLongitude;
+  final double distLatitude;
+  final double distLongitude;
+  final int passengers;
+  final int availableFuel;
+
+  History({
+    required this.shipId,
+    required this.srcLatitude,
+    required this.srcLongitude,
+    required this.distLatitude,
+    required this.distLongitude,
+    required this.passengers,
+    required this.availableFuel,
+  });
+
+  factory History.fromJson(Map<String, dynamic> json) {
+    return History(
+      shipId: json['ship_id'].toString(),
+      srcLatitude: (json['src_latitude'] as num).toDouble(),
+      srcLongitude: (json['src_longitude'] as num).toDouble(),
+      distLatitude: (json['dist_latitude'] as num).toDouble(),
+      distLongitude: (json['dist_longitude'] as num).toDouble(),
+      passengers: json['passengers'] is int
+          ? json['passengers']
+          : int.tryParse(json['passengers'].toString()) ?? 0,
+      availableFuel: json['available_fuel'] is int
+          ? json['available_fuel']
+          : int.tryParse(json['available_fuel'].toString()) ?? 0,
+    );
+  }
+}
+
 class ApiService {
   // Replace with your actual backend URL
   static const String baseUrl = 'http://192.168.0.108:8000';
@@ -103,7 +139,7 @@ class ApiService {
   }
 
   Future<bool> bookTrip({
-    required int shipId,
+    required String shipId,
     required double srcLatitude,
     required double srcLongitude,
     required double distLatitude,
@@ -133,6 +169,18 @@ class ApiService {
       return true;
     } else {
       throw Exception("Failed to book trip: ${response.body}");
+    }
+  }
+
+   Future<List<History>> fetchShipHistory(String shipId) async {
+    final String url = '$baseUrl/trip/history?id=$shipId';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+      return jsonList.map((json) => History.fromJson(json)).toList();
+    } else {
+      throw Exception("Failed to fetch ship history: ${response.body}");
     }
   }
 }

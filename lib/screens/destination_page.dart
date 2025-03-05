@@ -188,9 +188,19 @@ class _DestinationPageState extends State<DestinationPage> {
         _destLng != null) {
       try {
         // Convert parameters to proper types.
-        int shipId = int.tryParse(widget.shipId) ?? 0;
+        String shipId =widget.shipId;
         int passengers = int.tryParse(widget.voyagers) ?? 0;
         int fuel = int.tryParse(widget.availableFuel) ?? 0;
+        var data = {
+          "ship_id": shipId,
+          "src_latitude": _startLat,
+          "src_longitude": _startLng,
+          "dist_latitude": _destLat,
+          "dist_longitude": _destLng,
+          "passengers": passengers,
+          "available_fuel": fuel,
+        };
+        print(data);
         bool booked = await ApiService().bookTrip(
           shipId: shipId,
           srcLatitude: _startLat!,

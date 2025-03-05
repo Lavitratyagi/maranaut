@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maranaut/screens/history_voyage.dart';
 import 'package:maranaut/screens/select_yoyage.dart';
 
 class HomePage extends StatefulWidget {
@@ -211,12 +212,17 @@ class _HomePageState extends State<HomePage> {
                           backgroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          // TODO: Implement Check Route action.
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HistoryVoyagePage(),
+                            ),
+                          );
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Text("Check Route"),
+                            Text("History"),
                             SizedBox(width: 4),
                             Icon(Icons.arrow_forward),
                           ],
