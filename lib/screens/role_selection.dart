@@ -7,10 +7,10 @@ class RoleSelectionPage extends StatelessWidget {
   final String password;
 
   const RoleSelectionPage({
-    Key? key,
+    super.key,
     required this.email,
     required this.password,
-  }) : super(key: key);
+  });
 
   // Function to call API service based on role selection
   void _handleRoleSelection(BuildContext context, bool isAdmin) async {

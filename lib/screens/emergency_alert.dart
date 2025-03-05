@@ -5,7 +5,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class EmergencyAlertPage extends StatefulWidget {
   final String shipId;
-  const EmergencyAlertPage({Key? key, required this.shipId}) : super(key: key);
+  const EmergencyAlertPage({super.key, required this.shipId});
 
   @override
   _EmergencyAlertPageState createState() => _EmergencyAlertPageState();

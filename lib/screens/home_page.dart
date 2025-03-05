@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               height: 30,
               color: Colors.white,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             const Text("MaraNaut", style: TextStyle(color: Colors.white)),
             const Spacer(),
             const Icon(Icons.person, color: Colors.white),
@@ -158,7 +158,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
-                      child: const Text("Select Ship"),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: const Color(0xFFA6CEEF),
@@ -167,6 +166,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         minimumSize: const Size(0, 50),
                       ),
+                      child: const Text("Select Ship"),
                     ),
                   ],
                 ),

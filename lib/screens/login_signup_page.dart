@@ -3,7 +3,7 @@ import 'package:maranaut/screens/login_page.dart';
 import 'package:maranaut/screens/signup.dart';
 
 class LoginSignupPage extends StatelessWidget {
-  const LoginSignupPage({Key? key}) : super(key: key);
+  const LoginSignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {

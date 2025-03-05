@@ -3,7 +3,7 @@ import 'package:maranaut/Api%20Service/api_service.dart';
 import 'package:maranaut/screens/ship_history.dart';
 
 class HistoryVoyagePage extends StatefulWidget {
-  const HistoryVoyagePage({Key? key}) : super(key: key);
+  const HistoryVoyagePage({super.key});
 
   @override
   State<HistoryVoyagePage> createState() => _HistoryVoyagePageState();

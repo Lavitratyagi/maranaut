@@ -3,7 +3,7 @@ import 'package:maranaut/Api%20Service/api_service.dart';
 
 class HistoryPage extends StatefulWidget {
   final String shipId;
-  const HistoryPage({Key? key, required this.shipId}) : super(key: key);
+  const HistoryPage({super.key, required this.shipId});
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();

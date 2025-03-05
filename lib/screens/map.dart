@@ -11,13 +11,13 @@ class MapPage extends StatefulWidget {
   final double destLng;
 
   const MapPage({
-    Key? key,
+    super.key,
     required this.shipId,
     required this.startLat,
     required this.startLng,
     required this.destLat,
     required this.destLng,
-  }) : super(key: key);
+  });
 
   @override
   State<MapPage> createState() => _MapPageState();

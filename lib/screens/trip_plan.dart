@@ -4,7 +4,7 @@ import 'destination_page.dart'; // Ensure this page exists for navigation
 
 class TripPlan extends StatefulWidget {
   final String shipId;
-  const TripPlan({Key? key, required this.shipId}) : super(key: key);
+  const TripPlan({super.key, required this.shipId});
 
   @override
   State<TripPlan> createState() => _TripPlanState();

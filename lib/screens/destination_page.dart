@@ -8,11 +8,11 @@ class DestinationPage extends StatefulWidget {
   final String availableFuel;
 
   const DestinationPage({
-    Key? key,
+    super.key,
     required this.shipId,
     required this.voyagers,
     required this.availableFuel,
-  }) : super(key: key);
+  });
 
   @override
   State<DestinationPage> createState() => _DestinationPageState();

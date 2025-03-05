@@ -5,7 +5,7 @@ import 'package:maranaut/Api%20Service/api_service.dart';
 import 'package:maranaut/screens/home_page.dart'; // Import HomePage
 
 class SelectShip extends StatefulWidget {
-  const SelectShip({Key? key}) : super(key: key);
+  const SelectShip({super.key});
 
   @override
   State<SelectShip> createState() => _SelectShipState();

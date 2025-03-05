@@ -3,7 +3,7 @@ import 'package:maranaut/Api%20Service/api_service.dart';
 import 'package:maranaut/screens/home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();

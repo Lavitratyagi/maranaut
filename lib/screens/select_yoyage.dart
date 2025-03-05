@@ -3,7 +3,7 @@ import 'package:maranaut/Api%20Service/api_service.dart';
 import 'package:maranaut/screens/trip_plan.dart';
 
 class SelectVoyagePage extends StatefulWidget {
-  const SelectVoyagePage({Key? key}) : super(key: key);
+  const SelectVoyagePage({super.key});
 
   @override
   State<SelectVoyagePage> createState() => _SelectVoyagePageState();
