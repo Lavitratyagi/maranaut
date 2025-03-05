@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maranaut/screens/alerts.dart';
 import 'package:maranaut/screens/emergency_alert.dart';
 import 'package:maranaut/screens/history_voyage.dart';
 import 'package:maranaut/screens/select_ship.dart';
@@ -91,7 +92,9 @@ class _HomePageState extends State<HomePage> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/images/bg.png'), // Replace with your background asset.
+                image: AssetImage(
+                  'assets/images/bg.png',
+                ), // Replace with your background asset.
                 fit: BoxFit.cover,
               ),
             ),
@@ -218,7 +221,12 @@ class _HomePageState extends State<HomePage> {
                           backgroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          // TODO: Implement Recent Alerts action.
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AlertsPage(),
+                            ),
+                          );
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
