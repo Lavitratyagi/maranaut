@@ -39,11 +39,6 @@ class _LoginPageState extends State<LoginPage> {
       final apiService = ApiService();
       final response = await apiService.login(email: email, password: password);
 
-      // For demonstration, show the returned string in a SnackBar
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Response: $response")));
-
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),

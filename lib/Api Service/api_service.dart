@@ -89,4 +89,16 @@ class ApiService {
       throw Exception('Failed to load ships');
     }
   }
+
+  Future<Ship> fetchShipDetail(String shipId) async {
+    final url = Uri.parse('$baseUrl/ships?id=$shipId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return Ship.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to load ship details');
+    }
+  }
 }

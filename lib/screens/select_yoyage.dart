@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maranaut/Api%20Service/api_service.dart';
+import 'package:maranaut/screens/trip_plan.dart';
 
 class SelectVoyagePage extends StatefulWidget {
   const SelectVoyagePage({Key? key}) : super(key: key);
@@ -45,19 +46,32 @@ class _SelectVoyagePageState extends State<SelectVoyagePage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      // Full-screen background image
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/images/choose_voyage.png', // Replace with your background asset
+            ),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Column(
           children: [
-            // Centered heading
+            const SizedBox(height: 16),
+            // Centered Heading
             const Center(
               child: Text(
                 "Select Your Voyage",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            // FutureBuilder to load ship data from the API
+            // Expanded list of ships
             Expanded(
               child: FutureBuilder<List<Ship>>(
                 future: _futureShips,
@@ -65,24 +79,66 @@ class _SelectVoyagePageState extends State<SelectVoyagePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
+                    return Center(
+                        child: Text('Error: ${snapshot.error}',
+                            style: const TextStyle(color: Colors.white)));
                   } else if (snapshot.hasData) {
                     final ships = snapshot.data!;
                     return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       itemCount: ships.length,
                       itemBuilder: (context, index) {
                         final ship = ships[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: ListTile(
-                            title: Text(ship.shipName),
-                            subtitle: Text(ship.type),
+                        return GestureDetector(
+                          onTap: () {
+                            // Pass the ship id to the next page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TripPlan(shipId: ship.id),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            color: Colors.white,
+                            child: Container(
+                              height: 100, // Increased height
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    ship.shipName,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    ship.type,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
                     );
                   } else {
-                    return const Center(child: Text("No ships found."));
+                    return const Center(
+                        child: Text("No ships found.",
+                            style: TextStyle(color: Colors.white)));
                   }
                 },
               ),
