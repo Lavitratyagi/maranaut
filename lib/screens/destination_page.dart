@@ -188,7 +188,7 @@ class _DestinationPageState extends State<DestinationPage> {
         _destLng != null) {
       try {
         // Convert parameters to proper types.
-        String shipId =widget.shipId;
+        String shipId = widget.shipId;
         int passengers = int.tryParse(widget.voyagers) ?? 0;
         int fuel = int.tryParse(widget.availableFuel) ?? 0;
         var data = {
@@ -222,6 +222,7 @@ class _DestinationPageState extends State<DestinationPage> {
                     startLng: _startLng!,
                     destLat: _destLat!,
                     destLng: _destLng!,
+                    shipId: widget.shipId,
                   ),
             ),
           );

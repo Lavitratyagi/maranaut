@@ -69,6 +69,42 @@ class History {
   }
 }
 
+class Trip {
+  final double srcLatitude;
+  final double srcLongitude;
+  final double distLatitude;
+  final double distLongitude;
+  final int passengers;
+  final int availableFuel;
+  final String date; // Ensure your backend sends a date field
+
+  Trip({
+    required this.srcLatitude,
+    required this.srcLongitude,
+    required this.distLatitude,
+    required this.distLongitude,
+    required this.passengers,
+    required this.availableFuel,
+    required this.date,
+  });
+
+  factory Trip.fromJson(Map<String, dynamic> json) {
+    return Trip(
+      srcLatitude: (json['src_latitude'] as num).toDouble(),
+      srcLongitude: (json['src_longitude'] as num).toDouble(),
+      distLatitude: (json['dist_latitude'] as num).toDouble(),
+      distLongitude: (json['dist_longitude'] as num).toDouble(),
+      passengers: json['passengers'] is int
+          ? json['passengers']
+          : int.tryParse(json['passengers'].toString()) ?? 0,
+      availableFuel: json['available_fuel'] is int
+          ? json['available_fuel']
+          : int.tryParse(json['available_fuel'].toString()) ?? 0,
+      date: json['date'] ?? 'N/A',
+    );
+  }
+}
+
 class ApiService {
   // Replace with your actual backend URL
   static const String baseUrl = 'http://192.168.0.108:8000';
@@ -181,6 +217,16 @@ class ApiService {
       return jsonList.map((json) => History.fromJson(json)).toList();
     } else {
       throw Exception("Failed to fetch ship history: ${response.body}");
+    }
+  }
+
+  Future<Trip> fetchLastTrip(String shipId) async {
+    final url = Uri.parse('$baseUrl/trip?id=$shipId');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      return Trip.fromJson(json.decode(response.body));
+    } else {
+      throw Exception("Failed to fetch last trip");
     }
   }
 }
