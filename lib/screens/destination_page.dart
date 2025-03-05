@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maranaut/screens/map.dart';
+import 'package:maranaut/Api%20Service/api_service.dart';
+import 'map.dart'; // Import the MapPage
 
 class DestinationPage extends StatefulWidget {
   final String shipId;
@@ -18,7 +19,7 @@ class DestinationPage extends StatefulWidget {
 }
 
 class _DestinationPageState extends State<DestinationPage> {
-  // Mock data for demonstration
+  // Mock locations for demonstration.
   final List<Map<String, String>> mockLocations = [
     {
       'name': 'Chennai Port',
@@ -40,37 +41,35 @@ class _DestinationPageState extends State<DestinationPage> {
     },
   ];
 
-  // Controllers for the name fields
+  // Controllers for the location name fields.
   final TextEditingController _startNameController = TextEditingController();
   final TextEditingController _destinationNameController =
       TextEditingController();
 
-  // FocusNodes for tracking focus of the name fields
+  // FocusNodes to manage focus.
   final FocusNode _startFocusNode = FocusNode();
   final FocusNode _destinationFocusNode = FocusNode();
 
-  // Variables to hold details (lat, long, country) for the selected location
+  // Strings to hold non-editable location details.
   String _startDetails = "";
   String _destinationDetails = "";
 
-  // Variables to store the selected coordinates
+  // Variables to store the selected coordinates.
   double? _startLat;
   double? _startLng;
   double? _destLat;
   double? _destLng;
 
-  // Lists to hold filtered search suggestions for each field
+  // Lists to hold filtered suggestions.
   List<Map<String, String>> _filteredStartingLocations = [];
   List<Map<String, String>> _filteredDestinationLocations = [];
 
   @override
   void initState() {
     super.initState();
-    // Initially, show all locations
     _filteredStartingLocations = List.from(mockLocations);
     _filteredDestinationLocations = List.from(mockLocations);
 
-    // When focus changes, update the UI to show/hide suggestions.
     _startFocusNode.addListener(() {
       setState(() {});
     });
@@ -88,7 +87,7 @@ class _DestinationPageState extends State<DestinationPage> {
     super.dispose();
   }
 
-  // Updates the name and details when a location is selected.
+  // Called when a location suggestion is tapped.
   void _selectLocation(Map<String, String> location, bool isStarting) {
     final name = location['name'] ?? 'Unknown';
     final details =
@@ -112,13 +111,14 @@ class _DestinationPageState extends State<DestinationPage> {
     });
   }
 
-  // Filter method for starting locations.
+  // Filter starting locations based on query.
   void _filterStartingLocations(String query) {
     setState(() {
-      _filteredStartingLocations = mockLocations.where((loc) {
-        final locName = loc['name']!.toLowerCase();
-        return locName.contains(query.toLowerCase());
-      }).toList();
+      _filteredStartingLocations =
+          mockLocations.where((loc) {
+            final locName = loc['name']!.toLowerCase();
+            return locName.contains(query.toLowerCase());
+          }).toList();
 
       _filteredStartingLocations.sort((a, b) {
         final aName = a['name']!.toLowerCase();
@@ -133,13 +133,14 @@ class _DestinationPageState extends State<DestinationPage> {
     });
   }
 
-  // Filter method for destination locations.
+  // Filter destination locations based on query.
   void _filterDestinationLocations(String query) {
     setState(() {
-      _filteredDestinationLocations = mockLocations.where((loc) {
-        final locName = loc['name']!.toLowerCase();
-        return locName.contains(query.toLowerCase());
-      }).toList();
+      _filteredDestinationLocations =
+          mockLocations.where((loc) {
+            final locName = loc['name']!.toLowerCase();
+            return locName.contains(query.toLowerCase());
+          }).toList();
 
       _filteredDestinationLocations.sort((a, b) {
         final aName = a['name']!.toLowerCase();
@@ -154,9 +155,11 @@ class _DestinationPageState extends State<DestinationPage> {
     });
   }
 
-  // Widget to show search suggestions.
+  // Widget to show suggestions.
   Widget _buildSuggestions(
-      List<Map<String, String>> suggestions, bool isStarting) {
+    List<Map<String, String>> suggestions,
+    bool isStarting,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
@@ -177,16 +180,68 @@ class _DestinationPageState extends State<DestinationPage> {
     );
   }
 
+  // Called when the Book button is pressed.
+  Future<void> _onBookPressed() async {
+    if (_startLat != null &&
+        _startLng != null &&
+        _destLat != null &&
+        _destLng != null) {
+      try {
+        // Convert parameters to proper types.
+        int shipId = int.tryParse(widget.shipId) ?? 0;
+        int passengers = int.tryParse(widget.voyagers) ?? 0;
+        int fuel = int.tryParse(widget.availableFuel) ?? 0;
+        bool booked = await ApiService().bookTrip(
+          shipId: shipId,
+          srcLatitude: _startLat!,
+          srcLongitude: _startLng!,
+          distLatitude: _destLat!,
+          distLongitude: _destLng!,
+          passengers: passengers,
+          availableFuel: fuel,
+        );
+
+        if (booked) {
+          // Navigate to MapPage upon successful booking.
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (_) => MapPage(
+                    startLat: _startLat!,
+                    startLng: _startLng!,
+                    destLat: _destLat!,
+                    destLng: _destLng!,
+                  ),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Booking failed: ${e.toString()}")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Please select both starting and destination locations.",
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Standard AppBar
+      // Standard AppBar.
       appBar: AppBar(
         backgroundColor: const Color(0xFF021934),
         title: Row(
           children: [
             Image.asset(
-              'assets/images/logo.png', // Replace with your logo asset
+              'assets/images/logo.png', // Replace with your logo asset.
               height: 30,
               color: Colors.white,
             ),
@@ -203,24 +258,23 @@ class _DestinationPageState extends State<DestinationPage> {
       ),
       body: Stack(
         children: [
-          // Top map image (fixed height of 200px)
+          // Top map image.
           SizedBox(
             width: double.infinity,
             child: Image.asset(
-              'assets/images/map_img.png', // Replace with your image asset
+              'assets/images/map_img.png', // Replace with your image asset.
               fit: BoxFit.cover,
             ),
           ),
-          // White container below the map, filling the remaining space
+          // White container with form below the map.
           Positioned(
-            top: 200, // Place the container just below the map
+            top: 200,
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                // Rounded corners at the top
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
@@ -231,7 +285,6 @@ class _DestinationPageState extends State<DestinationPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // "You're Online" + horizontal line
                     Center(
                       child: Text(
                         "You're online",
@@ -243,7 +296,6 @@ class _DestinationPageState extends State<DestinationPage> {
                       ),
                     ),
                     const Divider(),
-                    // Row: "Set up your upcoming trip" + subtext + ship icon on right
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -278,7 +330,7 @@ class _DestinationPageState extends State<DestinationPage> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    // Starting location field with search functionality.
+                    // Starting location text field with suggestions.
                     TextField(
                       controller: _startNameController,
                       focusNode: _startFocusNode,
@@ -291,26 +343,26 @@ class _DestinationPageState extends State<DestinationPage> {
                       ),
                       onChanged: (query) {
                         setState(() {
-                          // Clear details if user manually edits the name.
                           _startDetails = "";
                         });
                         _filterStartingLocations(query);
                       },
                     ),
-                    // Display the details (lat, long, country) if available.
                     if (_startDetails.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           _startDetails,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    // Show suggestions if the starting field is focused.
                     if (_startFocusNode.hasFocus)
                       _buildSuggestions(_filteredStartingLocations, true),
                     const SizedBox(height: 16),
-                    // Destination location field with search functionality.
+                    // Destination location text field with suggestions.
                     TextField(
                       controller: _destinationNameController,
                       focusNode: _destinationFocusNode,
@@ -328,20 +380,20 @@ class _DestinationPageState extends State<DestinationPage> {
                         _filterDestinationLocations(query);
                       },
                     ),
-                    // Display the details (lat, long, country) if available.
                     if (_destinationDetails.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           _destinationDetails,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    // Show suggestions if the destination field is focused.
                     if (_destinationFocusNode.hasFocus)
                       _buildSuggestions(_filteredDestinationLocations, false),
                     const SizedBox(height: 24),
-                    // Displaying the mock data (optional)
                     Text(
                       "Ship ID: ${widget.shipId}\nVoyagers: ${widget.voyagers}\nAvailable Fuel: ${widget.availableFuel}",
                       style: const TextStyle(fontSize: 16),
@@ -351,7 +403,7 @@ class _DestinationPageState extends State<DestinationPage> {
               ),
             ),
           ),
-          // "Book" button positioned at the bottom of the Scaffold
+
           Positioned(
             bottom: 16,
             left: 16,
@@ -364,32 +416,7 @@ class _DestinationPageState extends State<DestinationPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {
-                // Ensure both starting and destination coordinates are selected.
-                if (_startLat != null &&
-                    _startLng != null &&
-                    _destLat != null &&
-                    _destLng != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MapPage(
-                        startLat: _startLat!,
-                        startLng: _startLng!,
-                        destLat: _destLat!,
-                        destLng: _destLng!,
-                      ),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                          "Please select both starting and destination locations."),
-                    ),
-                  );
-                }
-              },
+              onPressed: _onBookPressed,
               child: const Text(
                 'Book',
                 style: TextStyle(fontSize: 18, color: Colors.white),

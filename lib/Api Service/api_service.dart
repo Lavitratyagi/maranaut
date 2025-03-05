@@ -101,4 +101,38 @@ class ApiService {
       throw Exception('Failed to load ship details');
     }
   }
+
+  Future<bool> bookTrip({
+    required int shipId,
+    required double srcLatitude,
+    required double srcLongitude,
+    required double distLatitude,
+    required double distLongitude,
+    required int passengers,
+    required int availableFuel,
+  }) async {
+    final String url = '$baseUrl/trip/register';
+    final Map<String, dynamic> body = {
+      "ship_id": shipId,
+      "src_latitude": srcLatitude,
+      "src_longitude": srcLongitude,
+      "dist_latitude": distLatitude,
+      "dist_longitude": distLongitude,
+      "passengers": passengers,
+      "available_fuel": availableFuel,
+    };
+    print('step 1');
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: json.encode(body),
+    );
+
+    if (response.statusCode == 200) {
+      print('step 2');
+      return true;
+    } else {
+      throw Exception("Failed to book trip: ${response.body}");
+    }
+  }
 }

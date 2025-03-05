@@ -31,20 +31,19 @@ class _TripPlanState extends State<TripPlan> {
 
   void _handleNext() {
     if (_formKey.currentState!.validate()) {
-      // Collect the form data
+      // Collect the form data.
       final voyagers = _voyagersController.text.trim();
       final availableFuel = _fuelController.text.trim();
 
-      // Navigate to the next page and pass the data.
+      // Navigate to the DestinationPage and pass the data.
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => DestinationPage(
-                shipId: widget.shipId,
-                voyagers: voyagers,
-                availableFuel: availableFuel,
-              ),
+          builder: (context) => DestinationPage(
+            shipId: widget.shipId,
+            voyagers: voyagers,
+            availableFuel: availableFuel,
+          ),
         ),
       );
     }
@@ -53,12 +52,11 @@ class _TripPlanState extends State<TripPlan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Add an AppBar
+      // AppBar with logo and icons.
       appBar: AppBar(
         backgroundColor: const Color(0xFF021934),
         title: Row(
           children: [
-            // Logo and "MeraNaut" text on the left
             Image.asset(
               'assets/images/logo.png', // Replace with your logo asset
               height: 30,
@@ -67,7 +65,6 @@ class _TripPlanState extends State<TripPlan> {
             const SizedBox(width: 8),
             const Text("MeraNaut", style: TextStyle(color: Colors.white)),
             const Spacer(),
-            // Icons on the right: location, bell, user
             const Icon(Icons.location_on, color: Colors.white),
             const SizedBox(width: 8),
             const Icon(Icons.notifications, color: Colors.white),
@@ -77,12 +74,11 @@ class _TripPlanState extends State<TripPlan> {
         ),
       ),
       body: Container(
-        // Make the container fill the entire screen
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(
           image: DecorationImage(
             image: const AssetImage('assets/images/choose_voyage.png'),
-            fit: BoxFit.cover, // Fill the screen
+            fit: BoxFit.cover,
           ),
         ),
         child: FutureBuilder<Ship>(
@@ -104,7 +100,7 @@ class _TripPlanState extends State<TripPlan> {
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
-                    // White card containing ship info and the form
+                    // White card with ship details and form.
                     Container(
                       padding: const EdgeInsets.all(16),
                       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -118,7 +114,6 @@ class _TripPlanState extends State<TripPlan> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Display ship details (optional)
                             Text(
                               shipDetail.shipName,
                               style: const TextStyle(
@@ -135,7 +130,7 @@ class _TripPlanState extends State<TripPlan> {
                               ),
                             ),
                             const Divider(height: 24, thickness: 1),
-                            // Voyagers on board field
+                            // Voyagers on board field.
                             TextFormField(
                               controller: _voyagersController,
                               decoration: const InputDecoration(
@@ -150,7 +145,7 @@ class _TripPlanState extends State<TripPlan> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            // Available Fuel field
+                            // Available Fuel field.
                             TextFormField(
                               controller: _fuelController,
                               decoration: const InputDecoration(
@@ -165,7 +160,6 @@ class _TripPlanState extends State<TripPlan> {
                               },
                             ),
                             const SizedBox(height: 24),
-                            // Button to choose destination/source
                             Center(
                               child: ElevatedButton(
                                 onPressed: _handleNext,
