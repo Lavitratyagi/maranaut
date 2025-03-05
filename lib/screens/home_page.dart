@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maranaut/screens/select_yoyage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -136,7 +137,12 @@ class _HomePageState extends State<HomePage> {
                     const Spacer(),
                     ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement add ship functionality.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SelectVoyagePage(),
+                          ),
+                        );
                       },
                       child: const Text("New Ship"),
                       style: ElevatedButton.styleFrom(
