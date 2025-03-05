@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maranaut/screens/history_voyage.dart';
+import 'package:maranaut/screens/select_ship.dart';
 import 'package:maranaut/screens/select_yoyage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,30 +13,46 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Placeholder values; in a real app, these would be fetched from a backend.
+  // Default placeholder values.
   double totalFuelSaved = 1234.56;
   String shipName = "Sea Explorer";
   String shipModel = "X-200";
 
-  // This function would be called to refresh the fuel data from your backend.
+  // Function to refresh the fuel data.
   void _refreshFuelData() {
-    // TODO: Rehit your endpoint to fetch new fuel data.
     setState(() {
-      // For demonstration, just update with a random value.
       totalFuelSaved = totalFuelSaved + 10;
     });
+  }
+
+  // Function to load the selected ship data from local storage.
+  Future<void> loadShipData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shipJson = prefs.getString("selectedShip");
+    if (shipJson != null) {
+      final shipData = json.decode(shipJson);
+      setState(() {
+        shipName = shipData["shipName"] ?? shipName;
+        shipModel = shipData["type"] ?? shipModel;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadShipData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar with logo, text, and user icon; all in white.
+      // AppBar with logo, text, and user icon.
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
           children: [
-            // Logo on the left
             Image.asset(
               'assets/images/logo.png', // Replace with your logo asset
               height: 30,
@@ -42,37 +61,31 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(width: 8),
             const Text("MaraNaut", style: TextStyle(color: Colors.white)),
             const Spacer(),
-            // User icon on the right
             const Icon(Icons.person, color: Colors.white),
           ],
         ),
       ),
-      // Use a Stack so that the background image fills the screen and the white card is pinned at the bottom.
+      // Stack to display the background image and bottom card.
       body: Stack(
         children: [
-          // Full-screen Background image
+          // Full-screen Background image.
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                  'assets/images/bg.png', // Replace with your background asset
-                ),
+                  'assets/images/bg.png',
+                ), // Replace with your background asset
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          // Main scrollable content
+          // Main scrollable content.
           SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              16,
-              16,
-              150,
-            ), // Extra bottom padding to avoid overlap with the bottom card.
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 150),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Text
+                // Header Text.
                 const Text(
                   "Let’s manage your Ocean Moves.",
                   style: TextStyle(
@@ -82,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Total Fuel Saved Section
+                // Total Fuel Saved Section.
                 const Text(
                   "Total Fuel Saved",
                   style: TextStyle(fontSize: 16, color: Colors.white),
@@ -105,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Ship Information Section
+                // Ship Information Section.
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -141,11 +154,11 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SelectVoyagePage(),
+                            builder: (context) => const SelectShip(),
                           ),
                         );
                       },
-                      child: const Text("New Ship"),
+                      child: const Text("Select Ship"),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: const Color(0xFFA6CEEF),
@@ -158,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Row with two buttons: Check Route and Recent Alerts
+                // Row with two buttons: Check Route and Recent Alerts.
                 Row(
                   children: [
                     Expanded(
@@ -254,7 +267,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          // White card pinned at the bottom
+          // White card pinned at the bottom.
           Positioned(
             left: 16,
             right: 16,
@@ -282,7 +295,12 @@ class _HomePageState extends State<HomePage> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement ADD VOYAGE functionality or navigation.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SelectVoyagePage(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(

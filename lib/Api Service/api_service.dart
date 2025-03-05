@@ -59,12 +59,14 @@ class History {
       srcLongitude: (json['src_longitude'] as num).toDouble(),
       distLatitude: (json['dist_latitude'] as num).toDouble(),
       distLongitude: (json['dist_longitude'] as num).toDouble(),
-      passengers: json['passengers'] is int
-          ? json['passengers']
-          : int.tryParse(json['passengers'].toString()) ?? 0,
-      availableFuel: json['available_fuel'] is int
-          ? json['available_fuel']
-          : int.tryParse(json['available_fuel'].toString()) ?? 0,
+      passengers:
+          json['passengers'] is int
+              ? json['passengers']
+              : int.tryParse(json['passengers'].toString()) ?? 0,
+      availableFuel:
+          json['available_fuel'] is int
+              ? json['available_fuel']
+              : int.tryParse(json['available_fuel'].toString()) ?? 0,
     );
   }
 }
@@ -94,12 +96,14 @@ class Trip {
       srcLongitude: (json['src_longitude'] as num).toDouble(),
       distLatitude: (json['dist_latitude'] as num).toDouble(),
       distLongitude: (json['dist_longitude'] as num).toDouble(),
-      passengers: json['passengers'] is int
-          ? json['passengers']
-          : int.tryParse(json['passengers'].toString()) ?? 0,
-      availableFuel: json['available_fuel'] is int
-          ? json['available_fuel']
-          : int.tryParse(json['available_fuel'].toString()) ?? 0,
+      passengers:
+          json['passengers'] is int
+              ? json['passengers']
+              : int.tryParse(json['passengers'].toString()) ?? 0,
+      availableFuel:
+          json['available_fuel'] is int
+              ? json['available_fuel']
+              : int.tryParse(json['available_fuel'].toString()) ?? 0,
       date: json['date'] ?? 'N/A',
     );
   }
@@ -208,7 +212,7 @@ class ApiService {
     }
   }
 
-   Future<List<History>> fetchShipHistory(String shipId) async {
+  Future<List<History>> fetchShipHistory(String shipId) async {
     final String url = '$baseUrl/trip/history?id=$shipId';
     final response = await http.get(Uri.parse(url));
 
