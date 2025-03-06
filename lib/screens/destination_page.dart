@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maranaut/Api%20Service/api_service.dart';
-import 'map.dart'; // Import the MapPage
+import 'package:maranaut/screens/map.dart';
 
 class DestinationPage extends StatefulWidget {
   final String shipId;
@@ -19,25 +19,31 @@ class DestinationPage extends StatefulWidget {
 }
 
 class _DestinationPageState extends State<DestinationPage> {
-  // Mock locations for demonstration.
+  // Updated mock data.
   final List<Map<String, String>> mockLocations = [
     {
-      'name': 'Chennai Port',
-      'lat': '13.0827',
-      'long': '80.2707',
-      'country': 'India',
+      "LOCODE": "INBOM",
+      "NAME": "Mumbai (ex Bombay)",
+      "LAT": "18.93486649067586",
+      "LON": "72.85446166992188",
     },
     {
-      'name': 'Mumbai Port',
-      'lat': '18.9647',
-      'long': '72.8250',
-      'country': 'India',
+      "LOCODE": "INMAA",
+      "NAME": "Chennai (ex Madras)",
+      "LAT": "13.115508962306507",
+      "LON": "80.30902862548831",
     },
     {
-      'name': 'Singapore Port',
-      'lat': '1.3521',
-      'long': '103.8198',
-      'country': 'Singapore',
+      "LOCODE": "INCCU",
+      "NAME": "Kolkata",
+      "LAT": "22.547796871438308",
+      "LON": "88.30698966979983",
+    },
+    {
+      "LOCODE": "INVTZ",
+      "NAME": "Visakhapatnam",
+      "LAT": "17.687121802737536",
+      "LON": "83.30074310302737",
     },
   ];
 
@@ -89,22 +95,22 @@ class _DestinationPageState extends State<DestinationPage> {
 
   // Called when a location suggestion is tapped.
   void _selectLocation(Map<String, String> location, bool isStarting) {
-    final name = location['name'] ?? 'Unknown';
+    final name = location['NAME'] ?? 'Unknown';
     final details =
-        "${location['lat']}, ${location['long']} (${location['country']})";
+        "${location['LAT']}, ${location['LON']} (Code: ${location['LOCODE']})";
     setState(() {
       if (isStarting) {
         _startNameController.text = name;
         _startDetails = details;
-        _startLat = double.tryParse(location['lat']!);
-        _startLng = double.tryParse(location['long']!);
+        _startLat = double.tryParse(location['LAT']!);
+        _startLng = double.tryParse(location['LON']!);
         _filteredStartingLocations = List.from(mockLocations);
         _startFocusNode.unfocus();
       } else {
         _destinationNameController.text = name;
         _destinationDetails = details;
-        _destLat = double.tryParse(location['lat']!);
-        _destLng = double.tryParse(location['long']!);
+        _destLat = double.tryParse(location['LAT']!);
+        _destLng = double.tryParse(location['LON']!);
         _filteredDestinationLocations = List.from(mockLocations);
         _destinationFocusNode.unfocus();
       }
@@ -116,13 +122,13 @@ class _DestinationPageState extends State<DestinationPage> {
     setState(() {
       _filteredStartingLocations =
           mockLocations.where((loc) {
-            final locName = loc['name']!.toLowerCase();
+            final locName = loc['NAME']!.toLowerCase();
             return locName.contains(query.toLowerCase());
           }).toList();
 
       _filteredStartingLocations.sort((a, b) {
-        final aName = a['name']!.toLowerCase();
-        final bName = b['name']!.toLowerCase();
+        final aName = a['NAME']!.toLowerCase();
+        final bName = b['NAME']!.toLowerCase();
         final lowerQuery = query.toLowerCase();
         final aStarts = aName.startsWith(lowerQuery);
         final bStarts = bName.startsWith(lowerQuery);
@@ -138,13 +144,13 @@ class _DestinationPageState extends State<DestinationPage> {
     setState(() {
       _filteredDestinationLocations =
           mockLocations.where((loc) {
-            final locName = loc['name']!.toLowerCase();
+            final locName = loc['NAME']!.toLowerCase();
             return locName.contains(query.toLowerCase());
           }).toList();
 
       _filteredDestinationLocations.sort((a, b) {
-        final aName = a['name']!.toLowerCase();
-        final bName = b['name']!.toLowerCase();
+        final aName = a['NAME']!.toLowerCase();
+        final bName = b['NAME']!.toLowerCase();
         final lowerQuery = query.toLowerCase();
         final aStarts = aName.startsWith(lowerQuery);
         final bStarts = bName.startsWith(lowerQuery);
@@ -172,7 +178,7 @@ class _DestinationPageState extends State<DestinationPage> {
         itemBuilder: (context, index) {
           final location = suggestions[index];
           return ListTile(
-            title: Text(location['name'] ?? 'Unknown'),
+            title: Text(location['NAME'] ?? 'Unknown'),
             onTap: () => _selectLocation(location, isStarting),
           );
         },
@@ -216,14 +222,13 @@ class _DestinationPageState extends State<DestinationPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (_) => MapPage(
-                    startLat: _startLat!,
-                    startLng: _startLng!,
-                    destLat: _destLat!,
-                    destLng: _destLng!,
-                    shipId: widget.shipId,
-                  ),
+              builder: (_) => MapPage(
+                startLat: _startLat!,
+                startLng: _startLng!,
+                destLat: _destLat!,
+                destLng: _destLng!,
+                shipId: widget.shipId,
+              ),
             ),
           );
         }
