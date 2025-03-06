@@ -49,8 +49,7 @@ class _DestinationPageState extends State<DestinationPage> {
 
   // Controllers for the location name fields.
   final TextEditingController _startNameController = TextEditingController();
-  final TextEditingController _destinationNameController =
-      TextEditingController();
+  final TextEditingController _destinationNameController = TextEditingController();
 
   // FocusNodes to manage focus.
   final FocusNode _startFocusNode = FocusNode();
@@ -65,6 +64,10 @@ class _DestinationPageState extends State<DestinationPage> {
   double? _startLng;
   double? _destLat;
   double? _destLng;
+
+  // Variables to store the selected LOCODE values.
+  String? _srcLocode;
+  String? _dstLocode;
 
   // Lists to hold filtered suggestions.
   List<Map<String, String>> _filteredStartingLocations = [];
@@ -104,6 +107,7 @@ class _DestinationPageState extends State<DestinationPage> {
         _startDetails = details;
         _startLat = double.tryParse(location['LAT']!);
         _startLng = double.tryParse(location['LON']!);
+        _srcLocode = location['LOCODE'];
         _filteredStartingLocations = List.from(mockLocations);
         _startFocusNode.unfocus();
       } else {
@@ -111,6 +115,7 @@ class _DestinationPageState extends State<DestinationPage> {
         _destinationDetails = details;
         _destLat = double.tryParse(location['LAT']!);
         _destLng = double.tryParse(location['LON']!);
+        _dstLocode = location['LOCODE'];
         _filteredDestinationLocations = List.from(mockLocations);
         _destinationFocusNode.unfocus();
       }
@@ -120,11 +125,10 @@ class _DestinationPageState extends State<DestinationPage> {
   // Filter starting locations based on query.
   void _filterStartingLocations(String query) {
     setState(() {
-      _filteredStartingLocations =
-          mockLocations.where((loc) {
-            final locName = loc['NAME']!.toLowerCase();
-            return locName.contains(query.toLowerCase());
-          }).toList();
+      _filteredStartingLocations = mockLocations.where((loc) {
+        final locName = loc['NAME']!.toLowerCase();
+        return locName.contains(query.toLowerCase());
+      }).toList();
 
       _filteredStartingLocations.sort((a, b) {
         final aName = a['NAME']!.toLowerCase();
@@ -142,11 +146,10 @@ class _DestinationPageState extends State<DestinationPage> {
   // Filter destination locations based on query.
   void _filterDestinationLocations(String query) {
     setState(() {
-      _filteredDestinationLocations =
-          mockLocations.where((loc) {
-            final locName = loc['NAME']!.toLowerCase();
-            return locName.contains(query.toLowerCase());
-          }).toList();
+      _filteredDestinationLocations = mockLocations.where((loc) {
+        final locName = loc['NAME']!.toLowerCase();
+        return locName.contains(query.toLowerCase());
+      }).toList();
 
       _filteredDestinationLocations.sort((a, b) {
         final aName = a['NAME']!.toLowerCase();
@@ -162,10 +165,7 @@ class _DestinationPageState extends State<DestinationPage> {
   }
 
   // Widget to show suggestions.
-  Widget _buildSuggestions(
-    List<Map<String, String>> suggestions,
-    bool isStarting,
-  ) {
+  Widget _buildSuggestions(List<Map<String, String>> suggestions, bool isStarting) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
@@ -191,47 +191,38 @@ class _DestinationPageState extends State<DestinationPage> {
     if (_startLat != null &&
         _startLng != null &&
         _destLat != null &&
-        _destLng != null) {
+        _destLng != null &&
+        _srcLocode != null &&
+        _dstLocode != null) {
       try {
-        // Convert parameters to proper types.
         String shipId = widget.shipId;
-        int passengers = int.tryParse(widget.voyagers) ?? 0;
-        int fuel = int.tryParse(widget.availableFuel) ?? 0;
-        var data = {
-          "ship_id": shipId,
-          "src_latitude": _startLat,
-          "src_longitude": _startLng,
-          "dist_latitude": _destLat,
-          "dist_longitude": _destLng,
-          "passengers": passengers,
-          "available_fuel": fuel,
-        };
-        print(data);
-        bool booked = await ApiService().bookTrip(
+        // Build coordinate strings in "lat,lng" format.
+        String srcCoordinates = "$_startLat,$_startLng";
+        String dstCoordinates = "$_destLat,$_destLng";
+        // Call the API service function.
+        var response = await ApiService().bookTripWithRoute(
           shipId: shipId,
-          srcLatitude: _startLat!,
-          srcLongitude: _startLng!,
-          distLatitude: _destLat!,
-          distLongitude: _destLng!,
-          passengers: passengers,
-          availableFuel: fuel,
+          srcCoordinates: srcCoordinates,
+          dstCoordinates: dstCoordinates,
+          srcLocode: _srcLocode!,
+          dstLocode: _dstLocode!,
         );
-
-        if (booked) {
-          // Navigate to MapPage upon successful booking.
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => MapPage(
-                startLat: _startLat!,
-                startLng: _startLng!,
-                destLat: _destLat!,
-                destLng: _destLng!,
-                shipId: widget.shipId,
-              ),
-            ),
-          );
+        // Extract the route points from the response.
+        // Assuming the API returns: { "Path": { "Points": [ ... ] } }
+        final routePoints = response["Path"]["Points"];
+        if (routePoints == null) {
+          throw Exception("No route data returned from API");
         }
+        // Navigate to MapPage and pass the route data.
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MapPage(
+              shipId: widget.shipId,
+              route: routePoints,
+            ),
+          ),
+        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Booking failed: ${e.toString()}")),
@@ -240,9 +231,7 @@ class _DestinationPageState extends State<DestinationPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            "Please select both starting and destination locations.",
-          ),
+          content: Text("Please select both starting and destination locations."),
         ),
       );
     }
@@ -419,7 +408,6 @@ class _DestinationPageState extends State<DestinationPage> {
               ),
             ),
           ),
-
           Positioned(
             bottom: 16,
             left: 16,

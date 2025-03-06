@@ -233,4 +233,36 @@ class ApiService {
       throw Exception("Failed to fetch last trip");
     }
   }
+
+  Future<Map<String, dynamic>> bookTripWithRoute({
+    required String shipId,
+    required String srcCoordinates,
+    required String dstCoordinates,
+    required String srcLocode,
+    required String dstLocode,
+  }) async {
+    final queryParameters = {
+      "ship_id": shipId,
+      "src_coordinates": srcCoordinates,
+      "dst_coordinate": dstCoordinates,
+      "src_locode": srcLocode,
+      "dst_locode": dstLocode,
+    };
+
+    // Create the URL with query parameters.
+    final url = Uri.parse(
+      "$baseUrl/routes/get-coordinates",
+    ).replace(queryParameters: queryParameters);
+
+    final response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to book trip: ${response.statusCode}");
+    }
+  }
 }
